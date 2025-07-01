@@ -246,7 +246,7 @@ export default function FloatingBubbleQuoteLab() {
               transform: 'rotateY(-8deg) rotateX(4deg) scale(1.04)',
               boxShadow: '0 8px 32px 0 rgba(31, 38, 135, 0.18), 0 1.5px 0 0 #fca5a5, 0 0.5px 0 0 #7dd3fc',
             }}>
-              <Quote className="w-10 h-10 text-blue-500 mr-3" />
+              <Quote className="w-10 h-10 text-blue-500 mr-3 -scale-x-100" />
               <h1 className="text-5xl md:text-6xl font-bold text-gray-800">
                 <span className="bg-gradient-to-r from-blue-400 to-sky-400 bg-clip-text text-transparent">
                   Quote Generator
