@@ -31,15 +31,7 @@ export default function FloatingBubbleQuoteLab() {
   const [showShareToast, setShowShareToast] = useState(false);
   const [sparkles, setSparkles] = useState<Array<{id: number, left: number, top: number, delay: number, duration: number}>>([]);
 
-  // Mock quotes for demonstration
-  const mockQuotes = [
-    { text: "The future belongs to those who believe in their dreams.", topic: "Dreams", color: "from-rose-300 to-purple-400" },
-    { text: "Innovation sets leaders apart.", topic: "Innovation", color: "from-sky-300 to-blue-400" },
-    { text: "Your imagination is your only limit.", topic: "Imagination", color: "from-emerald-300 to-teal-400" },
-    { text: "Great things come from stepping beyond comfort.", topic: "Growth", color: "from-amber-300 to-orange-400" },
-    { text: "Love what you do to create great work.", topic: "Passion", color: "from-yellow-300 to-pink-400" },
-  ];
-
+  
   // Generate floating bubbles on client side only
   useEffect(() => {
     const newBubbles: Bubble[] = Array.from({ length: 12 }, (_, i) => ({
