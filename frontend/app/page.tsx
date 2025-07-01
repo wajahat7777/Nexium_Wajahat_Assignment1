@@ -1,6 +1,6 @@
 "use client";
 import { useState, useEffect } from 'react';
-import { Zap, Brain, Atom, Sparkles, RefreshCw, Copy, Share, Quote } from 'lucide-react';
+import { Zap, Brain, Atom, Sparkles, RefreshCw, Copy, Share, Quote, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
@@ -29,6 +29,8 @@ export default function FloatingBubbleQuoteLab() {
   const [bubbles, setBubbles] = useState<Bubble[]>([]);
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [showShareToast, setShowShareToast] = useState(false);
+  const [showShareModal, setShowShareModal] = useState(false);
+  const [shareText, setShareText] = useState("");
   const [sparkles, setSparkles] = useState<Array<{id: number, left: number, top: number, delay: number, duration: number}>>([]);
 
   
@@ -84,20 +86,50 @@ export default function FloatingBubbleQuoteLab() {
   const copyQuote = (text: string, index: number) => {
     navigator.clipboard.writeText(text);
     setCopiedIndex(index);
-    setTimeout(() => setCopiedIndex(null), 1500);
+    setTimeout(() => setCopiedIndex(null), 2000);
   };
 
   const shareQuote = async (text: string) => {
-    if (navigator.share) {
-      try {
-        await navigator.share({ text });
-      } catch (err) {
-        // User cancelled or error
-      }
-    } else {
-      setShowShareToast(true);
-      setTimeout(() => setShowShareToast(false), 2000);
+    setShareText(text);
+    setShowShareModal(true);
+  };
+
+  const shareToSocial = (platform: string) => {
+    const encodedText = encodeURIComponent(shareText);
+    let url = "";
+    
+    switch (platform) {
+      case "whatsapp":
+        url = `https://wa.me/?text=${encodedText}`;
+        break;
+      case "facebook":
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(window.location.href)}&quote=${encodedText}`;
+        break;
+      case "twitter":
+        url = `https://twitter.com/intent/tweet?text=${encodedText}`;
+        break;
+      case "instagram":
+        // Instagram doesn't support direct sharing via URL, so we copy to clipboard
+        navigator.clipboard.writeText(shareText);
+        setShowShareToast(true);
+        setTimeout(() => setShowShareToast(false), 2000);
+        setShowShareModal(false);
+        return;
+      case "telegram":
+        url = `https://t.me/share/url?url=${encodeURIComponent(window.location.href)}&text=${encodedText}`;
+        break;
+      case "copy":
+        navigator.clipboard.writeText(shareText);
+        setShowShareToast(true);
+        setTimeout(() => setShowShareToast(false), 2000);
+        setShowShareModal(false);
+        return;
+      default:
+        return;
     }
+    
+    window.open(url, '_blank', 'width=600,height=400');
+    setShowShareModal(false);
   };
 
   return (
@@ -238,7 +270,7 @@ export default function FloatingBubbleQuoteLab() {
                   type="text"
                   value={topic}
                   onChange={(e) => setTopic(e.target.value)}
-                  placeholder="Enter a topic for Quotes"
+                  placeholder="Enter a topic for Quotes e.g. Success, Happiness, Love, etc."
                   className="pl-10 bg-white/50 border-blue-300 text-gray-800 placeholder-blue-300 focus:border-blue-500"
                   onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
                 />
@@ -304,7 +336,11 @@ export default function FloatingBubbleQuoteLab() {
                           size="sm"
                           className="p-2 bg-sky-100/60 hover:bg-sky-200/80 rounded-full transition-colors shadow"
                         >
-                          <Copy className={`w-5 h-5 ${copiedIndex === index ? 'text-blue-900' : 'text-blue-500'} transition-colors duration-200`} />
+                          {copiedIndex === index ? (
+                            <Check className="w-5 h-5 text-green-600" />
+                          ) : (
+                            <Copy className="w-5 h-5 text-blue-500" />
+                          )}
                         </Button>
                         <Button
                           onClick={() => shareQuote(quote.text)}
@@ -326,7 +362,66 @@ export default function FloatingBubbleQuoteLab() {
 
       {showShareToast && (
         <div className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-900 text-white px-4 py-2 rounded shadow-lg z-50 animate-fadein">
-          Sharing not supported on this device.
+          {shareText ? "Quote copied to clipboard!" : "Sharing not supported on this device."}
+        </div>
+      )}
+
+      {/* Share Modal */}
+      {showShareModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 animate-fadein">
+          <div className="bg-white rounded-2xl p-6 max-w-sm w-full mx-4 shadow-2xl">
+            <div className="text-center mb-6">
+              <h3 className="text-xl font-bold text-gray-800 mb-2">Share Quote</h3>
+              <p className="text-gray-600 text-sm">Choose where to share this inspiring quote</p>
+            </div>
+            
+            <div className="grid grid-cols-2 gap-3 mb-6">
+              <Button
+                onClick={() => shareToSocial("whatsapp")}
+                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3"
+              >
+                WhatsApp
+              </Button>
+              <Button
+                onClick={() => shareToSocial("facebook")}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+              >
+                Facebook
+              </Button>
+              <Button
+                onClick={() => shareToSocial("twitter")}
+                className="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3"
+              >
+                Twitter
+              </Button>
+              <Button
+                onClick={() => shareToSocial("telegram")}
+                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3"
+              >
+                Telegram
+              </Button>
+              <Button
+                onClick={() => shareToSocial("instagram")}
+                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3"
+              >
+                Instagram
+              </Button>
+              <Button
+                onClick={() => shareToSocial("copy")}
+                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3"
+              >
+                Copy Text
+              </Button>
+            </div>
+            
+            <Button
+              onClick={() => setShowShareModal(false)}
+              variant="outline"
+              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+            >
+              Cancel
+            </Button>
+          </div>
         </div>
       )}
     </div>
