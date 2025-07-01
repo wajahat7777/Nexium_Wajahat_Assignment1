@@ -68,7 +68,7 @@ export default function FloatingBubbleQuoteLab() {
     setQuotes([]);
 
     try {
-      const res = await fetch(`https://nexium-wajahat-assignment1-backend.vercel.app/api/quotes?topic=${encodeURIComponent(topic)}`);
+      const res = await fetch(`https://nexium-wajahat-assignment1.vercel.app/api/quotes?topic=${encodeURIComponent(topic)}`);
       if (!res.ok) throw new Error("Network response was not ok");
       const data: Quote[] = await res.json();
       if (data.length === 0) {
