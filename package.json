@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "Quote Generator with Next.js frontend and Node.js backend",
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "dev": "npm-run-all --parallel dev:frontend dev:backend",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && node server.js",
     "install:all": "npm install && cd frontend && npm install && cd ../backend && npm install",
@@ -11,9 +11,15 @@
     "start": "cd frontend && npm start"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "npm-run-all": "^4.1.5"
   },
-  "keywords": ["nextjs", "nodejs", "quotes", "api"],
+  "keywords": [
+    "nextjs",
+    "nodejs",
+    "quotes",
+    "api"
+  ],
   "author": "Wajahat",
   "license": "MIT"
-} 
+}
