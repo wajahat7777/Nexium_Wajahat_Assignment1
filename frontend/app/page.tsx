@@ -1,9 +1,11 @@
 "use client";
 import { useState, useEffect } from 'react';
 import { Zap, Brain, Atom, Sparkles, RefreshCw, Copy, Share, Quote, Check } from 'lucide-react';
+import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card, CardContent } from '@/components/ui/card';
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 
 interface Quote {
   text: string;
@@ -21,8 +23,11 @@ interface Bubble {
   opacity: number;
 }
 
+interface FormData {
+  topic: string;
+}
+
 export default function FloatingBubbleQuoteLab() {
-  const [topic, setTopic] = useState("");
   const [quotes, setQuotes] = useState<Quote[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,7 +38,12 @@ export default function FloatingBubbleQuoteLab() {
   const [shareText, setShareText] = useState("");
   const [sparkles, setSparkles] = useState<Array<{id: number, left: number, top: number, delay: number, duration: number}>>([]);
 
-  
+  const form = useForm<FormData>({
+    defaultValues: {
+      topic: "",
+    },
+  });
+
   // Generate floating bubbles on client side only
   useEffect(() => {
     const newBubbles: Bubble[] = Array.from({ length: 12 }, (_, i) => ({
@@ -60,21 +70,21 @@ export default function FloatingBubbleQuoteLab() {
     setSparkles(newSparkles);
   }, []);
 
-  const handleSubmit = async () => {
-    if (!topic.trim()) return;
+  const onSubmit = async (data: FormData) => {
+    if (!data.topic.trim()) return;
 
     setLoading(true);
     setError("");
     setQuotes([]);
 
     try {
-      const res = await fetch(`https://nexium-wajahat-assignment1.vercel.app/api/quotes?topic=${encodeURIComponent(topic)}`);
+      const res = await fetch(`https://nexium-wajahat-assignment1.vercel.app/api/quotes?topic=${encodeURIComponent(data.topic)}`);
       if (!res.ok) throw new Error("Network response was not ok");
-      const data: Quote[] = await res.json();
-      if (data.length === 0) {
+      const quotesData: Quote[] = await res.json();
+      if (quotesData.length === 0) {
         setError("No quotes found for this topic. Try another keyword!");
       } else {
-        setQuotes(data.map((q: Quote) => ({ ...q, color: "from-sky-300 to-purple-400" })));
+        setQuotes(quotesData.map((q: Quote) => ({ ...q, color: "from-sky-300 to-purple-400" })));
       }
     } catch (err) {
       setError("Unable to fetch quotes. Please try again.");
@@ -263,38 +273,48 @@ export default function FloatingBubbleQuoteLab() {
         <div className="relative max-w-3xl w-full">
           {/* Control Panel */}
           <div className="backdrop-blur-md bg-white/70 border border-blue-200/50 smooth-morph p-6 mb-6 shadow-lg soft-glow">
-            <div className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
-              <div className="flex-1 w-full relative">
-                <Zap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5 animate-pulse z-10" />
-                <Input
-                  type="text"
-                  value={topic}
-                  onChange={(e) => setTopic(e.target.value)}
-                  placeholder="Enter a topic for Quotes e.g. Success, Happiness, Love, etc."
-                  className="pl-10 bg-white/50 border-blue-300 text-gray-800 placeholder-blue-300 focus:border-blue-500"
-                  onKeyPress={(e) => e.key === 'Enter' && handleSubmit()}
-                />
-              </div>
-              <Button
-                onClick={handleSubmit}
-                disabled={loading || !topic.trim()}
-                className="bg-gradient-to-r from-blue-400 to-sky-400 text-white font-semibold hover:from-blue-500 hover:to-sky-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
-              >
-                <div className="flex items-center space-x-2">
-                  {loading ? (
-                    <>
-                      <RefreshCw className="w-4 h-4 animate-spin" />
-                      <span>Searching...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Sparkles className="w-4 h-4" />
-                      <span>Find Quotes</span>
-                    </>
-                  )}
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-4">
+                <div className="flex-1 w-full relative">
+                  <Zap className="absolute left-3 top-1/2 transform -translate-y-1/2 text-blue-400 w-5 h-5 animate-pulse z-10" />
+                  <FormField
+                    control={form.control}
+                    name="topic"
+                    render={({ field }) => (
+                      <FormItem className="w-full">
+                        <FormControl>
+                          <Input
+                            {...field}
+                            placeholder="Enter a topic for Quotes e.g. Success, Happiness, Love, etc."
+                            className="pl-10 bg-white/50 border-blue-300 text-gray-800 placeholder-blue-300 focus:border-blue-500"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </Button>
-            </div>
+                <Button
+                  type="submit"
+                  disabled={loading || !form.watch('topic')?.trim()}
+                  className="bg-gradient-to-r from-blue-400 to-sky-400 text-white font-semibold hover:from-blue-500 hover:to-sky-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
+                >
+                  <div className="flex items-center space-x-2">
+                    {loading ? (
+                      <>
+                        <RefreshCw className="w-4 h-4 animate-spin" />
+                        <span>Searching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-4 h-4" />
+                        <span>Find Quotes</span>
+                      </>
+                    )}
+                  </div>
+                </Button>
+              </form>
+            </Form>
           </div>
 
           {/* Error Display */}
