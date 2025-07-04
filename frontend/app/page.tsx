@@ -398,46 +398,46 @@ export default function FloatingBubbleQuoteLab() {
             <div className="grid grid-cols-2 gap-3 mb-6">
               <Button
                 onClick={() => shareToSocial("whatsapp")}
-                className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3"
+                className="bg-green-500 hover:bg-green-600 text-white"
               >
                 WhatsApp
               </Button>
               <Button
                 onClick={() => shareToSocial("facebook")}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
               >
                 Facebook
               </Button>
               <Button
                 onClick={() => shareToSocial("twitter")}
-                className="bg-sky-500 hover:bg-sky-600 text-white font-semibold py-3"
+                className="bg-sky-500 hover:bg-sky-600 text-white"
               >
                 Twitter
               </Button>
               <Button
                 onClick={() => shareToSocial("telegram")}
-                className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3"
+                className="bg-blue-500 hover:bg-blue-600 text-white"
               >
                 Telegram
               </Button>
               <Button
                 onClick={() => shareToSocial("instagram")}
-                className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3"
+                className="bg-pink-500 hover:bg-pink-600 text-white"
               >
                 Instagram
               </Button>
               <Button
                 onClick={() => shareToSocial("copy")}
-                className="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-3"
+                className="bg-gray-500 hover:bg-gray-600 text-white"
               >
-                Copy Text
+                Copy Link
               </Button>
             </div>
             
             <Button
               onClick={() => setShowShareModal(false)}
               variant="outline"
-              className="w-full border-gray-300 text-gray-700 hover:bg-gray-50"
+              className="w-full"
             >
               Cancel
             </Button>
